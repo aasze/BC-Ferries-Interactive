@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <title>BC Ferries Route</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body { 
+        margin: 0; 
+        padding: 0; 
+      }
+      #map { 
+        position: absolute; 
+        top: 0; 
+        bottom: 0; 
+        width: 100%; 
+      }
+	    .map-overlay {
+          position: absolute;
+          bottom: 20;
+          right: 0;
+          background: #fff;
+          margin-right: 20px;
+          font-family: Arial, sans-serif;
+          overflow: auto;
+          border-radius: 3px;
+        }
+	
+    </style>
+  </head>
+  <body>
+    <div id='map'></div>
+	// Title 
+	<div class='map-overlay' id='features'><h3>BC Ferries Routes and Terminals</h3>
+      <div id='pd'><p>Click on a route line or terminal point to learn more about it!</p></div></div></div>
+	
+  
+
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWFzemUiLCJhIjoiY2wwMnY4a3ltMTdpdzNkdDgxb2xoZHV0NCJ9.zpM03UJBE3StDgYa_BRP2g'; 
+    const map = new mapboxgl.Map({
+      container: 'map',    
+      style: 'mapbox://styles/aasze/cl0yq5wmz001615o8n3686ksb', 
+      center: [-122.766, 48.955],
+      zoom: 7,
+    });
+
+// pop-out for routes
+map.on('click', (event) => {
+  const features = map.queryRenderedFeatures(event.point, {
+    layers: ['only-bc-ferries-routes'] 
+  });
+  if (!features.length) {
+    return;
+  }
+  const feature = features[0];
+
+const popup = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(event.lngLat)
+  .setHTML(
+    `<h3>${feature.properties.Name}</h3><p>${feature.properties.Frequency}</p>`
+  )
+  .addTo(map);
+});
+
+// pop-out for terminals
+map.on('click', (event) => {
+  const features = map.queryRenderedFeatures(event.point, {
+    layers: ['routes-ports'] 
+  });
+  if (!features.length) {
+    return;
+  }
+  const feature = features[0];
+
+const popup = new mapboxgl.Popup({ offset: [0, -15] })
+  .setLngLat(event.lngLat)
+  .setHTML(
+    `<h3>${feature.properties.Name}</h3>`
+  )
+  .addTo(map);
+});
+
+    </script>
+  </body>
+</html>
